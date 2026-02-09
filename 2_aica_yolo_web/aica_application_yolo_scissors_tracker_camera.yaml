@@ -1,0 +1,192 @@
+schema: 2-0-6
+dependencies:
+  core: v5.1.0
+on_start:
+  load:
+    - hardware: hardware
+    - component: camera_streamer
+components:
+  yolo_executor:
+    component: advanced_perception::object_detection::YoloExecutor
+    display_name: YOLO Executor
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: yolo_executor
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: yolo_executor
+            transition: activate
+        on_activate:
+          load:
+            component: bounding_box_tracker
+    parameters:
+      model_file:
+        value: /yolo-example-data/yolo12n.onnx
+        type: string
+      classes_file:
+        value: /yolo-example-data/coco.yaml
+        type: string
+      object_class:
+        value:
+          - scissors
+        type: string_array
+      conf_threshold:
+        value: 0.2
+        type: double
+      num_threads:
+        value: 2
+        type: int
+    inputs:
+      image: /camera_streamer/image
+    outputs:
+      detections: /yolo_executor/detections
+  camera_streamer:
+    component: core_vision_components::image_streaming::CameraStreamer
+    display_name: Camera Streamer
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: camera_streamer
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: camera_streamer
+            transition: activate
+        on_activate:
+          load:
+            component: yolo_executor
+    parameters:
+      camera_frame:
+        value: tool0
+        type: string
+    outputs:
+      image: /camera_streamer/image
+  bounding_box_tracker:
+    component: object_detection_utils::BoundingBoxTracker
+    display_name: Bounding box tracker
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: bounding_box_tracker
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: bounding_box_tracker
+            transition: activate
+    inputs:
+      detections: /yolo_executor/detections
+    outputs:
+      twist: /yolo_to_marker/twist
+hardware:
+  hardware:
+    display_name: Hardware Interface
+    urdf: Generic six-axis robot arm
+    rate: 100
+    events:
+      transitions:
+        on_load:
+          load:
+            - controller: robot_state_broadcaster
+              hardware: hardware
+            - controller: ik_velocity_controller
+              hardware: hardware
+    controllers:
+      robot_state_broadcaster:
+        plugin: aica_core_controllers/RobotStateBroadcaster
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: robot_state_broadcaster
+      ik_velocity_controller:
+        plugin: aica_core_controllers/velocity/IKVelocityController
+        inputs:
+          command: /yolo_to_marker/twist
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: ik_velocity_controller
+graph:
+  positions:
+    on_start:
+      x: -20
+      y: -360
+    stop:
+      x: -20
+      y: -260
+    components:
+      yolo_executor:
+        x: 740
+        y: -180
+      camera_streamer:
+        x: 200
+        y: -300
+      bounding_box_tracker:
+        x: 1400
+        y: 180
+    hardware:
+      hardware:
+        x: 1940
+        y: -360
+  edges:
+    yolo_to_marker_marker_pose_signal_point_attractor_attractor:
+      path:
+        - x: 1360
+          y: 520
+        - x: 1360
+          y: 680
+    yolo_executor_detections_yolo_to_marker_json_input:
+      path:
+        - x: 1160
+          y: 120
+        - x: 1160
+          y: 220
+        - x: 860
+          y: 220
+        - x: 860
+          y: 520
+    yolo_to_marker_twist_hardware_hardware_ik_velocity_controller_command:
+      path:
+        - x: 1820
+          y: 380
+        - x: 1820
+          y: 420
+    yolo_executor_detections_yolo_to_marker_detections:
+      path:
+        - x: 1200
+          y: 120
+        - x: 1200
+          y: 380
+    on_start_on_start_camera_streamer_camera_streamer:
+      path:
+        - x: 140
+          y: -300
+        - x: 140
+          y: -240
+    yolo_executor_on_activate_bounding_box_tracker_bounding_box_tracker:
+      path:
+        - x: 1300
+          y: 0
+        - x: 1300
+          y: 240
+    camera_streamer_image_yolo_executor_image:
+      path:
+        - x: 640
+          y: -40
+        - x: 640
+          y: 120
+    yolo_executor_detections_bounding_box_tracker_detections:
+      path:
+        - x: 1260
+          y: 120
+        - x: 1260
+          y: 400
+

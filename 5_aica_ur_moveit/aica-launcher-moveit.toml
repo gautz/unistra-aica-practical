@@ -1,0 +1,14 @@
+#syntax=ghcr.io/aica-technology/app-builder:v2
+
+[core]
+"image" = "v5.1.0"
+
+[packages]
+# add components
+
+# other extensions
+"@aica/foss/moveit" = "v0.1.0" # Add moveit2 core libraries
+# syntax in launcher: ghcr.io/aica-technology/moveit:v0.1.0
+
+# add hardware collections
+"@aica/collections/ur-collection" = "v4.3.0"

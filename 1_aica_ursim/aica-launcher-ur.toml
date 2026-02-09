@@ -1,0 +1,14 @@
+#syntax=ghcr.io/aica-technology/app-builder:v2
+
+[core]
+"image" = "v5.1.0"
+
+[packages]
+# add components
+
+# add hardware collections
+"@aica/collections/ur-collection" = "v4.3.0"
+
+# other extensions
+#"@aica/foss/web-video-server" = "v0.1.0" # enables web streaming of video topics
+# launcher syntax: ghcr.io/aica-technology/web-video-server:v0.1.0

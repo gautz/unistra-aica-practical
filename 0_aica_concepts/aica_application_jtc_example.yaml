@@ -1,0 +1,120 @@
+schema: 2-0-6
+dependencies:
+  core: v5.1.0
+frames:
+  start:
+    reference_frame: world
+    position:
+      x: 0.372464
+      y: 0.048147
+      z: 0.43
+    orientation:
+      w: -0.000563
+      x: 0.707388
+      y: 0.706825
+      z: 0.000001
+  waypoint_1:
+    reference_frame: start
+    position:
+      x: -0.2
+      y: 0
+      z: 0
+    orientation:
+      w: 1
+      x: 0
+      y: 0
+      z: 0
+  waypoint_2:
+    reference_frame: start
+    position:
+      x: 0
+      y: 0.2
+      z: 0
+    orientation:
+      w: 1
+      x: 0
+      y: 0
+      z: 0
+  waypoint_3:
+    reference_frame: start
+    position:
+      x: 0.2
+      y: 0
+      z: 0
+    orientation:
+      w: 1
+      x: 0
+      y: 0
+      z: 0
+on_start:
+  load:
+    hardware: hardware
+hardware:
+  hardware:
+    display_name: Hardware Interface
+    urdf: Generic six-axis robot arm
+    rate: 100
+    events:
+      transitions:
+        on_load:
+          load:
+            - controller: robot_state_broadcaster
+              hardware: hardware
+            - controller: joint_trajectory_controller
+              hardware: hardware
+    controllers:
+      robot_state_broadcaster:
+        plugin: aica_core_controllers/RobotStateBroadcaster
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: robot_state_broadcaster
+      joint_trajectory_controller:
+        plugin: aica_core_controllers/trajectory/JointTrajectoryController
+        events:
+          predicates:
+            has_trajectory_succeeded:
+              application: stop
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: joint_trajectory_controller
+graph:
+  positions:
+    on_start:
+      x: 420
+      y: -20
+    stop:
+      x: 420
+      y: 100
+    buttons:
+      button:
+        x: 100
+        y: 760
+    hardware:
+      hardware:
+        x: 680
+        y: -20
+  buttons:
+    button:
+      display_name: Set desired trajectory
+      on_click:
+        call_service:
+          controller: joint_trajectory_controller
+          hardware: hardware
+          service: set_trajectory
+          payload: |-
+            {
+              frames: [start, waypoint_1, waypoint_2, waypoint_3, start],
+              durations: [2.0]
+            }
+  edges:
+    hardware_hardware_joint_trajectory_controller_has_trajectory_succeeded_on_stop_on_stop:
+      path:
+        - x: 380
+          y: 740
+        - x: 380
+          y: 160

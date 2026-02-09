@@ -1,0 +1,88 @@
+schema: 2-0-6
+dependencies:
+  core: v5.1.0
+on_start:
+  load:
+    component: camera_streamer
+components:
+  camera_streamer:
+    component: core_vision_components::image_streaming::CameraStreamer
+    display_name: Camera Streamer
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: camera_streamer
+            transition: configure
+          load:
+            component: yolo_executor
+        on_configure:
+          lifecycle:
+            component: camera_streamer
+            transition: activate
+    parameters:
+      rate:
+        value: 25
+        type: double
+      source:
+        value: /yolo-example-data/example_from_tutorial_224x170_25fps.mp4
+        type: string
+      camera_frame:
+        value: tool0
+        type: string
+      frame_width:
+        value: 224
+        type: int
+      frame_height:
+        value: 170
+        type: int
+      fps:
+        value: 25
+        type: double
+    outputs:
+      image: /camera_streamer/image
+  yolo_executor:
+    component: advanced_perception::object_detection::YoloExecutor
+    display_name: YOLO Executor
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: yolo_executor
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: yolo_executor
+            transition: activate
+    parameters:
+      model_file:
+        value: /yolo-example-data/yolo12n.onnx
+        type: string
+      classes_file:
+        value: /yolo-example-data/coco.yaml
+        type: string
+      num_threads:
+        value: 2
+        type: int
+    inputs:
+      image: /camera_streamer/image
+graph:
+  positions:
+    stop:
+      x: 1160
+      y: 20
+    components:
+      camera_streamer:
+        x: 160
+        y: 0
+      yolo_executor:
+        x: 640
+        y: 0
+  edges:
+    camera_streamer_on_load_yolo_executor_yolo_executor:
+      path:
+        - x: 580
+          y: 180
+        - x: 580
+          y: 60
+

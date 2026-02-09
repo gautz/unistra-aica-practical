@@ -1,0 +1,10 @@
+#syntax=ghcr.io/aica-technology/app-builder:v2
+
+[core]
+"image" = "v5.1.0"
+
+[packages]
+# add components
+
+# add hardware collections
+"@aica/collections/ur-collection" = "v4.3.0"

@@ -1,0 +1,19 @@
+#syntax=ghcr.io/aica-technology/app-builder:v2
+# launch with bash: 
+[core]
+"image" = "v5.1.0"
+
+[packages]
+# add components
+#"@aica/components/rl-policy-components" = "v3.0.0"
+"@aica/components/advanced-perception" = "v1.0.0" # contains YoloExecutor
+"@aica/components/core-vision" = "v1.1.2" # contains CameraStreamer
+"@aica/foss/toolkits/cuda" = "v1.0.0-cuda24.12" # prerequisite for NVidia GPU acceleration
+"@aica/foss/toolkits/ml" = "v1.0.0-gpu24.12" # prerequisite for ML model inference
+
+# other extensions
+"object-detection-utils" # self-built component to feed goal frame extracted from yolo to robot velocity controller
+
+# add hardware collections
+"@aica/collections/intel-realsense-collection" = "v2.0.1" # D4XX and L515 cameras models, stream RGBD
+"@aica/collections/ur-collection" = "v4.3.0"
