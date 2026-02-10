@@ -1,0 +1,3 @@
+[submodule "simulators"]
+	path = simulators
+	url = https://github.com/aica-technology/simulators
