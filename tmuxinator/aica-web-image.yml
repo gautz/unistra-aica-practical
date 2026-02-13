@@ -1,0 +1,21 @@
+# ~/aica/tmuxinator/aica-web-image.yml
+
+name: aica-web-image
+root: ~/aica
+
+# pre_window: export currenttp=1
+
+windows:
+  - web-image:
+      layout: tiled
+      panes:
+        # - export currentuser=0 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=1 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=2 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=3 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=4 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=5 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=6 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=7 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        - export currentuser=8 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
+        # - export currentuser=9 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash && sudo ros2 run web_video_server web_video_server --ros-args -p port:=8081
