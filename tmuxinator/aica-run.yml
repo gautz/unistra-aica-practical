@@ -3,13 +3,13 @@
 name: aica-run
 root: ~/aica
 
-# pre_window: export currenttp=1
+#pre_window: export currenttp=1
 
 windows:
   - run-docker:
       layout: tiled
       panes:
-        - export currentuser=0 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
+        #- export currentuser=0 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
         - export currentuser=1 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
         - export currentuser=2 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
         - export currentuser=3 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
@@ -18,4 +18,4 @@ windows:
         - export currentuser=6 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
         - export currentuser=7 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
         - export currentuser=8 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
-        - export currentuser=9 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
+        #- export currentuser=9 && sudo docker run -it --rm --privileged --net=robot$currentuser -p 208${currentuser}0-208${currentuser}1:8080-8081 -v /home/robot$currentuser/aica/aica-license-robot$currentuser.toml:/license:ro -v /home/robot$currentuser/aica/persistent-tp$currenttp/:/data -v /home/robot$currentuser/aica/yolo-example-data/:/yolo-example-data:rw --name robot$currentuser aica-vision-web
