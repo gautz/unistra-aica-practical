@@ -3,13 +3,13 @@
 name: aica-config
 root: ~/aica
 
-# pre_window: export currenttp=1
+#pre_window: export currenttp=1
 
 windows:
   - config-workspace:
       layout: tiled
       panes:
-        # - export currentuser=O && sudo cd /home/robot$currentuser/aica
+        #- export currentuser=O && sudo cd /home/robot$currentuser/aica
         - export currentuser=1 && sudo cd /home/robot$currentuser/aica
         - export currentuser=2 && sudo cd /home/robot$currentuser/aica
         - export currentuser=3 && sudo cd /home/robot$currentuser/aica
@@ -18,4 +18,4 @@ windows:
         - export currentuser=6 && sudo cd /home/robot$currentuser/aica
         - export currentuser=7 && sudo cd /home/robot$currentuser/aica
         - export currentuser=8 && sudo cd /home/robot$currentuser/aica
-        # - export currentuser=9 && sudo cd /home/robot$currentuser/aica
+        #- export currentuser=9 && sudo cd /home/robot$currentuser/aica
