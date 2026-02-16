@@ -1,3 +1,6 @@
 [submodule "simulators"]
 	path = simulators
 	url = https://github.com/aica-technology/simulators
+[submodule "package-template"]
+	path = package-template
+	url = https://github.com/aica-technology/package-template
