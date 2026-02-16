@@ -9,13 +9,5 @@ windows:
   - in-container:
       layout: tiled
       panes:
-        #- export currentuser=O && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=1 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=2 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=3 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=4 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=5 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=6 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=7 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        - export currentuser=8 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        #- export currentuser=9 && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
+        - export currentuser=O && sudo cd /home/robot$currentuser/aica && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
+# Duplicate above line (pane) for each container you need for your practical lessons. Increment currentuser=0

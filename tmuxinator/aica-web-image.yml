@@ -9,33 +9,7 @@ windows:
   - web-image:
       layout: tiled
       panes:
-        #- robot0:
-        #  - export currentuser=0 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        #  - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot1:
-          - export currentuser=1 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
+        - robot0:
+          - export currentuser=0 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
           - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot2:
-          - export currentuser=2 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-          - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot3:
-          - export currentuser=3 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-          - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot4:
-          - export currentuser=4 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-          - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot5:
-          - export currentuser=5 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-          - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot6:
-          - export currentuser=6 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-          - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot7:
-          - export currentuser=7 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-          - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        - robot8:
-          - export currentuser=8 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-          - ros2 run web_video_server web_video_server --ros-args -p port:=8081
-        #- robot9:
-        #  - export currentuser=9 && sudo docker container exec -it -u ros2 robot$currentuser /bin/bash
-        #  - ros2 run web_video_server web_video_server --ros-args -p port:=8081
+# duplicate robot0 pane for each container you need for your practical lessons. Increment currentuser=0

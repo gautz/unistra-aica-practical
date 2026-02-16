@@ -9,13 +9,5 @@ windows:
   - config-workspace:
       layout: tiled
       panes:
-        #- export currentuser=O && sudo cd /home/robot$currentuser/aica
-        - export currentuser=1 && sudo cd /home/robot$currentuser/aica
-        - export currentuser=2 && sudo cd /home/robot$currentuser/aica
-        - export currentuser=3 && sudo cd /home/robot$currentuser/aica
-        - export currentuser=4 && sudo cd /home/robot$currentuser/aica
-        - export currentuser=5 && sudo cd /home/robot$currentuser/aica
-        - export currentuser=6 && sudo cd /home/robot$currentuser/aica
-        - export currentuser=7 && sudo cd /home/robot$currentuser/aica
-        - export currentuser=8 && sudo cd /home/robot$currentuser/aica
-        #- export currentuser=9 && sudo cd /home/robot$currentuser/aica
+        - export currentuser=O && sudo cd /home/robot$currentuser/aica
+# Duplicate above line for each container you need for your practical lessons. Increment currentuser=0
