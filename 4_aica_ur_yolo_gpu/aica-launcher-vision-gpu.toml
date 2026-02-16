@@ -1,5 +1,5 @@
 #syntax=ghcr.io/aica-technology/app-builder:v2
-# launch with bash: 
+
 [core]
 "image" = "v5.1.0"
 
@@ -12,7 +12,8 @@
 "@aica/foss/toolkits/ml" = "v1.0.0-gpu24.12" # prerequisite for ML model inference
 
 # other extensions
-"object-detection-utils" # self-built component to feed goal frame extracted from yolo to robot velocity controller
+#"object-detection-utils" = "docker-image://object-detection-utils" # self-built component to feed goal frame extracted from yolo to robot velocity controller
+# launcher syntax: object-detection-utils
 
 # add hardware collections
 "@aica/collections/intel-realsense-collection" = "v2.0.1" # D4XX and L515 cameras models, stream RGBD
