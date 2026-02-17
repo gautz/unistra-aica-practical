@@ -83,8 +83,9 @@ sudo docker run -it --rm --privileged --net=host -v /home/USERNAME/aica/aica-lic
 
 - L'argument `-e AICA_SUPER_ADMIN_PASSWORD=12345678` n'est nécessaire qu'au premier démarrage pour pouvoir créer un compte Admin.
 - ouvrir AICA Studio dans Chrome `server.tld:8080`
+- se connecter avec les identifiants `super-admin`, `12345678`
 - créer des comptes avec différentes permissions depuis l'interface super-admin
-- **si votre serveur est public, mettre une phrase-de-passe** forte car AICA Studio sera accessible tant que le conteneur est actif
+- **si votre serveur est public, mettre une phrase-de-passe forte** car AICA Studio sera accessible tant que le conteneur est actif
 - si nécessaire, pré-enregistrer des Applications AICA 
 - noter que dans un conteneur donné, tous les utilisateurs ont accès à toutes les Applications AICA. Pour isoler les utilisateurs, il faut qu'ils travaillent dans un conteneur avec un dossier persistant dédié
 - les comptes et applications sont sauvegardées dans une base de données SQL dans `/data` dans `aica.sqlite`, `aica.sqlite-shm` et `aica.sqlite-wal`
