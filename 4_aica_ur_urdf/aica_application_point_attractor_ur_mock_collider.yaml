@@ -5,9 +5,9 @@ frames:
   start:
     reference_frame: world
     position:
-      x: 0.119453
-      y: 0.459701
-      z: 0.553759
+      x: 0.124168
+      y: 0.45964
+      z: 0.54592
     orientation:
       w: 0.000502
       x: 0.999979
@@ -16,9 +16,9 @@ frames:
   target:
     reference_frame: world
     position:
-      x: 0.217599
-      y: 0.048224
-      z: 0.488755
+      x: -0.088079
+      y: 0.405845
+      z: 0.508915
     orientation:
       w: -0.000563
       x: 0.707388
@@ -28,9 +28,9 @@ on_start:
   load:
     - component: frame_broadcaster
     - component: signal_point_attractor
-    - component: frame_to_signal
     - component: frame_to_signal_copy
     - hardware: hardware
+    - component: frame_to_signal
 components:
   frame_broadcaster:
     component: aica_core_components::ros::StaticFrameBroadcaster
@@ -61,10 +61,18 @@ components:
     events:
       predicates:
         is_in_bounds:
-          load:
+          set:
+            parameter: linear_gains
+            value:
+              - 1
+            type: vector
             component: signal_point_attractor
         is_out_of_bounds:
-          load:
+          set:
+            parameter: linear_gains
+            value:
+              - 0
+            type: vector
             component: signal_point_attractor
       transitions:
         on_load:
@@ -76,6 +84,9 @@ components:
             component: box_collider
             transition: activate
     parameters:
+      publish_marker:
+        value: true
+        type: bool
       x_size:
         value: 0.8
         type: double
@@ -101,6 +112,9 @@ components:
           lifecycle:
             component: frame_to_signal
             transition: activate
+        on_activate:
+          load:
+            component: box_collider
     parameters:
       frame:
         value: start
@@ -227,7 +241,7 @@ graph:
         y: 1040
       frame_to_signal_copy:
         x: 60
-        y: 1460
+        y: 1620
     hardware:
       hardware:
         x: 2060
@@ -317,18 +331,24 @@ graph:
           y: -300
         - x: 460
           y: 1100
+    on_start_on_start_frame_to_signal_copy_frame_to_signal_copy:
+      path:
+        - x: -300
+          y: -300
+        - x: -300
+          y: 1680
+    frame_to_signal_copy_pose_signal_point_attractor_attractor:
+      path:
+        - x: 1340
+          y: 1840
+        - x: 1340
+          y: 1340
     on_start_on_start_frame_to_signal_frame_to_signal:
       path:
         - x: -180
           y: -300
         - x: -180
           y: 1280
-    on_start_on_start_frame_to_signal_copy_frame_to_signal_copy:
-      path:
-        - x: -300
-          y: -300
-        - x: -300
-          y: 1520
     box_collider_is_in_bounds_signal_point_attractor_signal_point_attractor:
       path:
         - x: 1420
@@ -341,6 +361,12 @@ graph:
           y: 1280
         - x: 1480
           y: 1100
+    frame_to_signal_on_activate_box_collider_box_collider:
+      path:
+        - x: 680
+          y: 1400
+        - x: 680
+          y: 1080
     hardware_hardware_joint_trajectory_controller_has_trajectory_succeeded_hardware_hardware_joint_trajectory_controller:
       path:
         - x: 1600
@@ -374,15 +400,9 @@ graph:
     frame_to_signal_pose_box_collider_center:
       path:
         - x: 680
-          y: 1440
+          y: 1480
         - x: 680
           y: 1400
-    frame_to_signal_copy_pose_signal_point_attractor_attractor:
-      path:
-        - x: 1340
-          y: 1680
-        - x: 1340
-          y: 1340
     signal_point_attractor_twist_hardware_hardware_ik_velocity_controller_command:
       path:
         - x: 2000
