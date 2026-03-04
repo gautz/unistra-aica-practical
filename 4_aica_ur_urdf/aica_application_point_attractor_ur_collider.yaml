@@ -1,0 +1,538 @@
+schema: 2-0-6
+dependencies:
+  core: v4.0.0
+frames:
+  start:
+    reference_frame: world
+    position:
+      x: 0.016268
+      y: 0.460877
+      z: 0.574409
+    orientation:
+      w: 0.000502
+      x: 0.999979
+      y: -0.005594
+      z: -0.003165
+on_start:
+  load:
+    - component: frame_broadcaster
+    - hardware: hardware
+  sequence:
+    start: sequence
+sequences:
+  sequence:
+    display_name: Sequence
+    steps:
+      - check:
+          condition:
+            controller: joint_trajectory_controller
+            hardware: hardware
+            predicate: has_trajectory_succeeded
+          wait_forever: true
+      - call_service:
+          controller: ur_dashboard_controller
+          hardware: hardware
+          service: zero_ftsensor
+      - check:
+          condition:
+            controller: ur_dashboard_controller
+            hardware: hardware
+            predicate: zero_ftsensor_success
+          wait_forever: true
+      - switch_controllers:
+          hardware: hardware
+          deactivate: joint_trajectory_controller
+components:
+  frame_broadcaster:
+    component: aica_core_components::ros::StaticFrameBroadcaster
+    display_name: Frame Broadcaster
+    parameters:
+      frame:
+        value: camera_link
+        type: string
+      reference_frame:
+        value: ur_tool0
+        type: string
+      pose_values:
+        value:
+          - -0.02
+          - -0.11752
+          - 0.032
+          - 1
+          - 0
+          - 0
+          - 0
+        type: double_array
+      broadcast_periodically:
+        value: true
+        type: bool
+  yolo_executor:
+    component: advanced_perception::object_detection::YoloExecutor
+    display_name: YOLO Executor
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: yolo_executor
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: yolo_executor
+            transition: activate
+        on_activate:
+          load:
+            component: bounding_box_tracker
+    parameters:
+      rate:
+        value: 30
+        type: double
+      model_file:
+        value: /data/models/yolo12n.onnx
+        type: string
+      classes_file:
+        value: /data/models/coco.yaml
+        type: string
+      object_class:
+        value:
+          - scissors
+        type: string_array
+      conf_threshold:
+        value: 0.4
+        type: double
+    inputs:
+      image: /camera_streamer/image
+    outputs:
+      detections: /yolo_executor/detections
+  bounding_box_tracker:
+    component: object_detection_utils::BoundingBoxTracker
+    display_name: Bounding box tracker
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: bounding_box_tracker
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: bounding_box_tracker
+            transition: activate
+    parameters:
+      rate:
+        value: 100
+        type: double
+      gains:
+        value:
+          - 0.008
+          - 0.008
+        type: double_array
+      decay_rate:
+        value: 8
+        type: double
+      reference_frame:
+        value: world
+        type: string
+    inputs:
+      detections: /yolo_executor/detections
+    outputs:
+      twist: /bounding_box_tracker/twist
+  box_collider:
+    component: aica_core_components::utility::BoxCollider
+    display_name: Box Collider
+    events:
+      predicates:
+        is_out_of_bounds:
+          set:
+            parameter: gains
+            value:
+              - 0
+              - 0
+            type: double_array
+            component: bounding_box_tracker
+        is_in_bounds:
+          set:
+            parameter: gains
+            value:
+              - 0.008
+              - 0.008
+            type: double_array
+            component: bounding_box_tracker
+      transitions:
+        on_load:
+          lifecycle:
+            component: box_collider
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: box_collider
+            transition: activate
+    parameters:
+      x_size:
+        value: 0.8
+        type: double
+      y_size:
+        value: 0.3
+        type: double
+      z_size:
+        value: 0.5
+        type: double
+    inputs:
+      target: /hardware/robot_state_broadcaster/cartesian_state
+      center: /frame_to_signal/pose
+  frame_to_signal:
+    component: aica_core_components::ros::TfToSignal
+    display_name: Frame to Signal
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: frame_to_signal
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: frame_to_signal
+            transition: activate
+        on_activate:
+          load:
+            component: box_collider
+    parameters:
+      frame:
+        value: start
+        type: string
+    outputs:
+      pose: /frame_to_signal/pose
+  camera_streamer:
+    component: core_vision_components::image_streaming::CameraStreamer
+    display_name: Camera Streamer
+    events:
+      transitions:
+        on_load:
+          load:
+            - component: yolo_executor
+            - component: frame_to_signal
+          lifecycle:
+            component: camera_streamer
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: camera_streamer
+            transition: activate
+    outputs:
+      image: /camera_streamer/image
+hardware:
+  hardware:
+    display_name: Hardware Interface
+    urdf: Universal Robots 5e
+    rate: 500
+    events:
+      transitions:
+        on_load:
+          load:
+            - controller: robot_state_broadcaster
+              hardware: hardware
+            - controller: joint_trajectory_controller
+              hardware: hardware
+            - controller: ur_impedance_controller
+              hardware: hardware
+            - controller: ur_dashboard_controller
+              hardware: hardware
+    parameters:
+      robot_ip: 192.168.56.101
+    controllers:
+      ur_dashboard_controller:
+        plugin: aica_ur_controllers/URDashboardController
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: ur_dashboard_controller
+      joint_trajectory_controller:
+        plugin: aica_core_controllers/trajectory/JointTrajectoryController
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: joint_trajectory_controller
+            on_deactivate:
+              load:
+                component: camera_streamer
+              switch_controllers:
+                hardware: hardware
+                activate: ur_impedance_controller
+            on_activate:
+              call_service:
+                controller: joint_trajectory_controller
+                hardware: hardware
+                service: set_trajectory
+                payload: |-
+                  frames:
+                    - start
+                  durations:
+                    - 2.0
+      robot_state_broadcaster:
+        plugin: aica_core_controllers/RobotStateBroadcaster
+        outputs:
+          cartesian_state: /hardware/robot_state_broadcaster/cartesian_state
+          ft_sensor: /hardware/robot_state_broadcaster/ft_sensor
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: robot_state_broadcaster
+      ur_impedance_controller:
+        plugin: aica_ur_controllers/URImpedanceController
+        parameters:
+          selection_vector:
+            value:
+              - 1
+              - 1
+              - 1
+              - 0
+              - 0
+              - 1
+            type: int_array
+          force_limit:
+            value:
+              - 40
+              - 40
+              - 40
+              - 30
+              - 30
+              - 30
+            type: vector
+          stiffness:
+            value:
+              - 500
+              - 500
+              - 500
+              - 400
+              - 400
+              - 400
+            type: vector
+          damping:
+            value:
+              - 50
+              - 50
+              - 50
+              - 10
+              - 10
+              - 10
+            type: vector
+        inputs:
+          command: /bounding_box_tracker/twist
+graph:
+  positions:
+    on_start:
+      x: -740
+      y: -360
+    stop:
+      x: -740
+      y: -260
+    components:
+      frame_broadcaster:
+        x: -420
+        y: -580
+      yolo_executor:
+        x: 760
+        y: 480
+      bounding_box_tracker:
+        x: 1300
+        y: 600
+      box_collider:
+        x: 840
+        y: 1020
+      frame_to_signal:
+        x: 280
+        y: 1140
+      camera_streamer:
+        x: 180
+        y: 520
+    hardware:
+      hardware:
+        x: 1880
+        y: -360
+    sequences:
+      sequence:
+        x: -420
+        y: -280
+  edges:
+    yolo_to_marker_marker_pose_signal_point_attractor_attractor:
+      path:
+        - x: 1360
+          y: 520
+        - x: 1360
+          y: 680
+    yolo_executor_detections_yolo_to_marker_json_input:
+      path:
+        - x: 1160
+          y: 120
+        - x: 1160
+          y: 220
+        - x: 860
+          y: 220
+        - x: 860
+          y: 520
+    yolo_to_marker_twist_hardware_hardware_ik_velocity_controller_command:
+      path:
+        - x: 1740
+          y: 680
+        - x: 1740
+          y: 920
+    yolo_to_marker_twist_hardware_hardware_velocity_impedance_controller_command:
+      path:
+        - x: 1740
+          y: 680
+        - x: 1740
+          y: 920
+    hardware_hardware_robot_state_broadcaster_ft_sensor_hardware_hardware_velocity_impedance_controller_ft_sensor:
+      path:
+        - x: 1840
+          y: 700
+        - x: 1840
+          y: 960
+    hardware_hardware_ur_dashboard_controller_zero_ftsensor_success_sequence_sequence_condition_input_2:
+      path:
+        - x: -60
+          y: 80
+    yolo_to_marker_on_activate_hardware_hardware_ur_impedance_controller:
+      path:
+        - x: 1840
+          y: 700
+        - x: 1840
+          y: 1060
+    yolo_to_marker_twist_hardware_hardware_ur_impedance_controller_command:
+      path:
+        - x: 1740
+          y: 780
+        - x: 1740
+          y: 1220
+    orbbec_camera_on_load_yolo_executor_yolo_executor:
+      path:
+        - x: 680
+          y: 620
+        - x: 680
+          y: 540
+    orbbec_camera_on_load_frame_to_signal_frame_to_signal:
+      path:
+        - x: 680
+          y: 620
+        - x: 680
+          y: 1020
+        - x: 240
+          y: 1020
+        - x: 240
+          y: 1200
+    orbbec_camera_color_image_yolo_executor_image:
+      path:
+        - x: 640
+          y: 700
+        - x: 640
+          y: 780
+    on_start_on_start_frame_broadcaster_frame_broadcaster:
+      path:
+        - x: -540
+          y: -300
+        - x: -540
+          y: -520
+    on_start_on_start_sequence_sequence:
+      path:
+        - x: -540
+          y: -300
+        - x: -540
+          y: -220
+    hardware_joint_trajectory_controller_has_trajectory_succeeded_condition_sequence_sequence_condition_input_0:
+      path:
+        - x: -380
+          y: 440
+    sequence_sequence_event_trigger_1_hardware_hardware_ur_dashboard_controller_zero_ftsensor:
+      path:
+        - x: -220
+          y: 140
+    hardware_ur_dashboard_controller_zero_ftsensor_success_condition_sequence_sequence_condition_input_2:
+      path:
+        - x: -60
+          y: 60
+    sequence_sequence_event_trigger_3_hardware_hardware_joint_trajectory_controller:
+      path:
+        - x: 100
+          y: 200
+    box_collider_is_out_of_bounds_bounding_box_tracker_bounding_box_tracker:
+      path:
+        - x: 1400
+          y: 1280
+        - x: 1400
+          y: 1000
+        - x: 1280
+          y: 1000
+        - x: 1280
+          y: 660
+    box_collider_is_in_bounds_bounding_box_tracker_bounding_box_tracker:
+      path:
+        - x: 1360
+          y: 1240
+        - x: 1360
+          y: 1040
+        - x: 1260
+          y: 1040
+        - x: 1260
+          y: 660
+    frame_to_signal_on_activate_box_collider_box_collider:
+      path:
+        - x: 800
+          y: 1320
+        - x: 800
+          y: 1080
+    camera_streamer_on_load_yolo_executor_yolo_executor:
+      path:
+        - x: 620
+          y: 700
+        - x: 620
+          y: 540
+    camera_streamer_on_load_frame_to_signal_frame_to_signal:
+      path:
+        - x: 620
+          y: 700
+        - x: 620
+          y: 1060
+        - x: 260
+          y: 1060
+        - x: 260
+          y: 1200
+    hardware_hardware_joint_trajectory_controller_on_deactivate_camera_streamer_camera_streamer:
+      path:
+        - x: 100
+          y: 360
+        - x: 100
+          y: 580
+    hardware_hardware_joint_trajectory_controller_on_deactivate_hardware_hardware_ur_impedance_controller:
+      path:
+        - x: 1820
+          y: 360
+        - x: 1820
+          y: 1040
+    hardware_hardware_joint_trajectory_controller_on_activate_hardware_hardware_joint_trajectory_controller_set_trajectory:
+      path:
+        - x: 1800
+          y: 320
+        - x: 1800
+          y: 520
+    yolo_executor_detections_bounding_box_tracker_detections:
+      path:
+        - x: 1240
+          y: 780
+        - x: 1240
+          y: 820
+    bounding_box_tracker_twist_hardware_hardware_ur_impedance_controller_command:
+      path:
+        - x: 1760
+          y: 820
+        - x: 1760
+          y: 1200
+    hardware_hardware_robot_state_broadcaster_cartesian_state_box_collider_target:
+      path:
+        - x: 740
+          y: 940
+        - x: 740
+          y: 1360

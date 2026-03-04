@@ -1,0 +1,21 @@
+#syntax=ghcr.io/aica-technology/package-builder:v1.6.1
+
+[metadata]
+version = "0.1.0"
+description = ""
+
+[metadata.collection]
+name = "ur5e-cell"
+
+[build]
+type = "ros"
+image = "v2.0.6-jazzy"
+
+[build.packages.bringup]
+source = "git://github.com/ipa320/ur5e_cell#main:ur5e_cell_bringup"
+
+[build.packages.description]
+source = "git://github.com/ipa320/ur5e_cell#main:ur5e_cell_description"
+
+[build.packages.moveit_config]
+source = "git://github.com/ipa320/ur5e_cell#main:ur5_cell_moveit_config"

@@ -16,5 +16,5 @@
 # launcher syntax: object-detection-utils
 
 # add hardware collections
-"@aica/collections/intel-realsense-collection" = "v2.0.1" # D4XX and L515 cameras models, stream RGBD
+#"@aica/collections/intel-realsense-collection" = "v2.0.1" # D4XX and L515 cameras models, stream RGBD
 "@aica/collections/ur-collection" = "v4.3.0"

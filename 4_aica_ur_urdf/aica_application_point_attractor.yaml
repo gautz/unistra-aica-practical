@@ -1,0 +1,122 @@
+schema: 2-0-6
+dependencies:
+  core: v5.1.0
+frames:
+  target:
+    reference_frame: world
+    position:
+      x: 0.372464
+      y: 0.048147
+      z: 0.43
+    orientation:
+      w: -0.000563
+      x: 0.707388
+      y: 0.706825
+      z: 0.000001
+on_start:
+  load:
+    - component: signal_point_attractor
+    - hardware: hardware
+    - component: frame_to_signal
+components:
+  frame_to_signal:
+    component: aica_core_components::ros::TfToSignal
+    display_name: Frame to Signal
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: frame_to_signal
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: frame_to_signal
+            transition: activate
+    parameters:
+      frame: target
+    outputs:
+      pose: /frame_to_signal/pose
+  signal_point_attractor:
+    component: aica_core_components::motion::SignalPointAttractor
+    display_name: Signal Point Attractor
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: signal_point_attractor
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: signal_point_attractor
+            transition: activate
+    inputs:
+      state: /hardware/robot_state_broadcaster/cartesian_state
+      attractor: /frame_to_signal/pose
+    outputs:
+      twist: /signal_point_attractor/twist
+hardware:
+  hardware:
+    display_name: Hardware Interface
+    urdf: Generic six-axis robot arm
+    rate: 100
+    events:
+      transitions:
+        on_load:
+          load:
+            - controller: robot_state_broadcaster
+              hardware: hardware
+            - controller: ik_velocity_controller
+              hardware: hardware
+    controllers:
+      robot_state_broadcaster:
+        plugin: aica_core_controllers/RobotStateBroadcaster
+        outputs:
+          cartesian_state: /hardware/robot_state_broadcaster/cartesian_state
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: robot_state_broadcaster
+      ik_velocity_controller:
+        plugin: aica_core_controllers/velocity/IKVelocityController
+        inputs:
+          command: /signal_point_attractor/twist
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: ik_velocity_controller
+graph:
+  positions:
+    components:
+      frame_to_signal:
+        x: 200
+        y: 600
+      signal_point_attractor:
+        x: 660
+        y: 520
+    hardware:
+      hardware:
+        x: 1120
+        y: -20
+  edges:
+    on_start_on_start_signal_point_attractor_signal_point_attractor:
+      path:
+        - x: 380
+          y: 40
+        - x: 380
+          y: 580
+    on_start_on_start_frame_to_signal_frame_to_signal:
+      path:
+        - x: 140
+          y: 40
+        - x: 140
+          y: 660
+    hardware_hardware_robot_state_broadcaster_cartesian_state_signal_point_attractor_state:
+      path:
+        - x: 620
+          y: 520
+        - x: 620
+          y: 780

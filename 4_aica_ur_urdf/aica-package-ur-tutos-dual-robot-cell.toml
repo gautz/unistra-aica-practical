@@ -1,0 +1,24 @@
+#syntax=ghcr.io/aica-technology/package-builder:v1.6.1
+
+[metadata]
+version = "0.1.0"
+description = ""
+
+[metadata.collection]
+name = "my-dual-robot-cell"
+
+[build]
+type = "ros"
+image = "v2.0.6-jazzy"
+
+[build.packages.bringup]
+source = "git://github.com/UniversalRobots/Universal_Robots_ROS2_Tutorials#main:my_dual_robot_cell/my_dual_robot_cell_control"
+
+#[build.packages.control]
+#source = "git://github.com/UniversalRobots/Universal_Robots_ROS2_Tutorials#main:my_dual_robot_cell/my_dual_robot_cell_control"
+
+[build.packages.description]
+source = "git://github.com/UniversalRobots/Universal_Robots_ROS2_Tutorials#main:my_dual_robot_cell/my_dual_robot_cell_description"
+
+#[build.packages.moveit_config]
+#source = "git://github.com/UniversalRobots/Universal_Robots_ROS2_Tutorials#main:my_dual_robot_cell/my_dual_robot_cell_moveit_config"

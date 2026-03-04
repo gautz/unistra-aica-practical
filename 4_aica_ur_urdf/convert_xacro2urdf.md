@@ -1,0 +1,1 @@
+`ros2 run xacro xacro -o my_robot_cell.urdf /ws/install/my_robot_cell_description/share/my_robot_cell_description/urdf/my_robot_cell.urdf.xacro`
