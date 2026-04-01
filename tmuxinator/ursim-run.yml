@@ -1,0 +1,25 @@
+# ~/aica/tmuxinator/ursim-run.yml
+
+name: ursim-run
+root: ~/aica
+
+pre_window: export currenttp=1
+#pre_window: export currenttp=2
+
+windows:
+  - run-ursim:
+      layout: tiled
+      panes:
+        # - export currentuser=0 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=1 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=2 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=3 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=4 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=5 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=6 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=7 && sudo bash ./run.sh -m ur5e -i $currentuser
+        - export currentuser=8 && sudo bash ./run.sh -m ur5e -i $currentuser
+        # - export currentuser=9 && sudo bash ./run.sh -m ur5e -i $currentuser
+# Duplicate above line (pane) for each container you need for your practical lessons. Increment currentuser=0
+# Change 208${currentuser}0-208${currentuser}1 with the ports that are public on your server
+# Change currenttp=1 according to the current Group
