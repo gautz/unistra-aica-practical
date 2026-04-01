@@ -15,7 +15,7 @@ Avantages :
     - Avec un accès SSH pour un utilisateur dans le groupe `sudo`
     - Configuration minimum (pour les tests) : 30G de SSD, 2G de RAM, 2 vCPU
     - Configuration recommandée : 2G de RAM et 1 vCPU par étudiant/conteneur, 60G de SSD
-    - Avec `docker.io` installé
+    - Avec `docker-ce` installé (`docker.io` non testé)
     - De préférence avec GPU NVidia, les drivers propriétaires et `nvidia-container-toolkit` installés
 - Pour la configuration SSH, sudo, firewall : installation de yunohost.org recommandée
 - Serveur public avec 3 ports accessibles par étudiant OU serveur accessible dans le réseau local des PC de TP
@@ -67,7 +67,7 @@ Avantages :
 
 Pour déploiement sur un PC avec GPU NVidia, les drivers propriétaires et `nvidia-container-toolkit` installés :
 
-- Voir `4_aica_ur_yolo_gpu/aica-launcher-vision-gpu.toml`
+- Voir `3_aica_ur_yolo_gpu/aica-launcher-vision-gpu.toml`
 
 Pour déploiement sur un serveur sans GPU :
 
@@ -174,3 +174,10 @@ Il peut y avoir des Warnings qui sont à ignorer et apparaissent si Cloud Storag
 
 ### TP3 - Vision par IA avec Yolo - étudiants admin du serveur
 
+## TP de manipulation avancée à l'IUT Haguenau - déploiement de AICA sur PC avec GPU et Nvidia
+### Prérequis
+#### Côté client
+
+- Un PC avec une connexion rapide à la VM
+    - Pour l'utilisation de AICA Studio : Chrome/Chromium installé avec support de WebGL
+    - Pour donner accès à la configuration de AICA : VSCode/Codium installé avec l'extension `ms-vscode-remote.remote-ssh` (sur Codium `jeanp413.open-remote-ssh`, l'arborescence de fichier n'est accessible qu'en lecture-seule)

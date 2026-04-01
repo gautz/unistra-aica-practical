@@ -1,0 +1,411 @@
+schema: 2-0-6
+dependencies:
+  core: v4.0.0
+frames:
+  start:
+    reference_frame: world
+    position:
+      x: 0.124168
+      y: 0.45964
+      z: 0.54592
+    orientation:
+      w: 0.000502
+      x: 0.999979
+      y: -0.005594
+      z: -0.003165
+  target:
+    reference_frame: world
+    position:
+      x: -0.088079
+      y: 0.405845
+      z: 0.508915
+    orientation:
+      w: -0.000563
+      x: 0.707388
+      y: 0.706825
+      z: 0.000001
+on_start:
+  load:
+    - component: frame_broadcaster
+    - component: signal_point_attractor
+    - component: frame_to_signal_copy
+    - hardware: hardware
+    - component: frame_to_signal
+components:
+  frame_broadcaster:
+    component: aica_core_components::ros::StaticFrameBroadcaster
+    display_name: Frame Broadcaster
+    parameters:
+      frame:
+        value: camera_link
+        type: string
+      reference_frame:
+        value: ur_tool0
+        type: string
+      pose_values:
+        value:
+          - -0.02
+          - -0.11752
+          - 0.032
+          - 1
+          - 0
+          - 0
+          - 0
+        type: double_array
+      broadcast_periodically:
+        value: true
+        type: bool
+  box_collider:
+    component: aica_core_components::utility::BoxCollider
+    display_name: Box Collider
+    events:
+      predicates:
+        is_in_bounds:
+          set:
+            parameter: linear_gains
+            value:
+              - 1
+            type: vector
+            component: signal_point_attractor
+        is_out_of_bounds:
+          set:
+            parameter: linear_gains
+            value:
+              - 0
+            type: vector
+            component: signal_point_attractor
+      transitions:
+        on_load:
+          lifecycle:
+            component: box_collider
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: box_collider
+            transition: activate
+    parameters:
+      publish_marker:
+        value: true
+        type: bool
+      x_size:
+        value: 0.8
+        type: double
+      y_size:
+        value: 0.3
+        type: double
+      z_size:
+        value: 0.5
+        type: double
+    inputs:
+      target: /hardware/robot_state_broadcaster/cartesian_state
+      center: /frame_to_signal/pose
+  frame_to_signal:
+    component: aica_core_components::ros::TfToSignal
+    display_name: start to Signal
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: frame_to_signal
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: frame_to_signal
+            transition: activate
+        on_activate:
+          load:
+            component: box_collider
+    parameters:
+      frame:
+        value: start
+        type: string
+    outputs:
+      pose: /frame_to_signal/pose
+  signal_point_attractor:
+    component: aica_core_components::motion::SignalPointAttractor
+    display_name: Signal Point Attractor
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: signal_point_attractor
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: signal_point_attractor
+            transition: activate
+    inputs:
+      state: /hardware/robot_state_broadcaster/cartesian_state
+      attractor: /frame_to_signal_copy/pose
+    outputs:
+      twist: /signal_point_attractor/twist
+  frame_to_signal_copy:
+    component: aica_core_components::ros::TfToSignal
+    display_name: target to Signal
+    events:
+      transitions:
+        on_load:
+          lifecycle:
+            component: frame_to_signal_copy
+            transition: configure
+        on_configure:
+          lifecycle:
+            component: frame_to_signal_copy
+            transition: activate
+    parameters:
+      frame:
+        value: target
+        type: string
+    outputs:
+      pose: /frame_to_signal_copy/pose
+hardware:
+  hardware:
+    display_name: Hardware Interface
+    urdf: Universal Robots 5e (mock interface)
+    rate: 500
+    events:
+      transitions:
+        on_load:
+          load:
+            - controller: robot_state_broadcaster
+              hardware: hardware
+            - controller: joint_trajectory_controller
+              hardware: hardware
+            - controller: ik_velocity_controller
+              hardware: hardware
+    parameters:
+      robot_ip: 192.168.56.101
+    controllers:
+      joint_trajectory_controller:
+        plugin: aica_core_controllers/trajectory/JointTrajectoryController
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: joint_trajectory_controller
+            on_deactivate:
+              switch_controllers:
+                hardware: hardware
+                activate: ik_velocity_controller
+            on_activate:
+              call_service:
+                controller: joint_trajectory_controller
+                hardware: hardware
+                service: set_trajectory
+                payload: |-
+                  frames:
+                    - start
+                  durations:
+                    - 2.0
+          predicates:
+            has_trajectory_succeeded:
+              switch_controllers:
+                hardware: hardware
+                deactivate: joint_trajectory_controller
+      robot_state_broadcaster:
+        plugin: aica_core_controllers/RobotStateBroadcaster
+        outputs:
+          cartesian_state: /hardware/robot_state_broadcaster/cartesian_state
+          ft_sensor: /hardware/robot_state_broadcaster/ft_sensor
+        events:
+          transitions:
+            on_load:
+              switch_controllers:
+                hardware: hardware
+                activate: robot_state_broadcaster
+      ik_velocity_controller:
+        plugin: aica_core_controllers/velocity/IKVelocityController
+        inputs:
+          command: /signal_point_attractor/twist
+graph:
+  positions:
+    on_start:
+      x: -740
+      y: -360
+    stop:
+      x: -740
+      y: -260
+    components:
+      frame_broadcaster:
+        x: -420
+        y: -580
+      box_collider:
+        x: 840
+        y: 1020
+      frame_to_signal:
+        x: 140
+        y: 1220
+      signal_point_attractor:
+        x: 1560
+        y: 1040
+      frame_to_signal_copy:
+        x: 60
+        y: 1620
+    hardware:
+      hardware:
+        x: 2060
+        y: -360
+  edges:
+    yolo_to_marker_marker_pose_signal_point_attractor_attractor:
+      path:
+        - x: 1360
+          y: 520
+        - x: 1360
+          y: 680
+    yolo_executor_detections_yolo_to_marker_json_input:
+      path:
+        - x: 1160
+          y: 120
+        - x: 1160
+          y: 220
+        - x: 860
+          y: 220
+        - x: 860
+          y: 520
+    yolo_to_marker_twist_hardware_hardware_ik_velocity_controller_command:
+      path:
+        - x: 1740
+          y: 680
+        - x: 1740
+          y: 920
+    yolo_to_marker_twist_hardware_hardware_velocity_impedance_controller_command:
+      path:
+        - x: 1740
+          y: 680
+        - x: 1740
+          y: 920
+    hardware_hardware_robot_state_broadcaster_ft_sensor_hardware_hardware_velocity_impedance_controller_ft_sensor:
+      path:
+        - x: 1840
+          y: 700
+        - x: 1840
+          y: 960
+    hardware_hardware_ur_dashboard_controller_zero_ftsensor_success_sequence_sequence_condition_input_2:
+      path:
+        - x: -60
+          y: 80
+    yolo_to_marker_on_activate_hardware_hardware_ur_impedance_controller:
+      path:
+        - x: 1840
+          y: 700
+        - x: 1840
+          y: 1060
+    yolo_to_marker_twist_hardware_hardware_ur_impedance_controller_command:
+      path:
+        - x: 1740
+          y: 780
+        - x: 1740
+          y: 1220
+    orbbec_camera_on_load_yolo_executor_yolo_executor:
+      path:
+        - x: 680
+          y: 620
+        - x: 680
+          y: 540
+    orbbec_camera_on_load_frame_to_signal_frame_to_signal:
+      path:
+        - x: 680
+          y: 620
+        - x: 680
+          y: 1020
+        - x: 240
+          y: 1020
+        - x: 240
+          y: 1200
+    orbbec_camera_color_image_yolo_executor_image:
+      path:
+        - x: 640
+          y: 700
+        - x: 640
+          y: 780
+    on_start_on_start_frame_broadcaster_frame_broadcaster:
+      path:
+        - x: -540
+          y: -300
+        - x: -540
+          y: -520
+    on_start_on_start_signal_point_attractor_signal_point_attractor:
+      path:
+        - x: 460
+          y: -300
+        - x: 460
+          y: 1100
+    on_start_on_start_frame_to_signal_copy_frame_to_signal_copy:
+      path:
+        - x: -300
+          y: -300
+        - x: -300
+          y: 1680
+    frame_to_signal_copy_pose_signal_point_attractor_attractor:
+      path:
+        - x: 1340
+          y: 1840
+        - x: 1340
+          y: 1340
+    on_start_on_start_frame_to_signal_frame_to_signal:
+      path:
+        - x: -180
+          y: -300
+        - x: -180
+          y: 1280
+    box_collider_is_in_bounds_signal_point_attractor_signal_point_attractor:
+      path:
+        - x: 1420
+          y: 1240
+        - x: 1420
+          y: 1100
+    box_collider_is_out_of_bounds_signal_point_attractor_signal_point_attractor:
+      path:
+        - x: 1480
+          y: 1280
+        - x: 1480
+          y: 1100
+    frame_to_signal_on_activate_box_collider_box_collider:
+      path:
+        - x: 680
+          y: 1400
+        - x: 680
+          y: 1080
+    hardware_hardware_joint_trajectory_controller_has_trajectory_succeeded_hardware_hardware_joint_trajectory_controller:
+      path:
+        - x: 1600
+          y: 140
+        - x: 1600
+          y: -100
+    hardware_hardware_joint_trajectory_controller_on_deactivate_hardware_hardware_ik_velocity_controller:
+      path:
+        - x: 1720
+          y: 60
+        - x: 1720
+          y: 740
+    hardware_hardware_joint_trajectory_controller_on_activate_hardware_hardware_joint_trajectory_controller_set_trajectory:
+      path:
+        - x: 1820
+          y: 20
+        - x: 1820
+          y: 220
+    hardware_hardware_robot_state_broadcaster_cartesian_state_box_collider_target:
+      path:
+        - x: 740
+          y: 640
+        - x: 740
+          y: 1360
+    hardware_hardware_robot_state_broadcaster_cartesian_state_signal_point_attractor_state:
+      path:
+        - x: 1540
+          y: 640
+        - x: 1540
+          y: 1300
+    frame_to_signal_pose_box_collider_center:
+      path:
+        - x: 680
+          y: 1480
+        - x: 680
+          y: 1400
+    signal_point_attractor_twist_hardware_hardware_ik_velocity_controller_command:
+      path:
+        - x: 2000
+          y: 1300
+        - x: 2000
+          y: 900
